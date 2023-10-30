@@ -1,5 +1,9 @@
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { IoMoonOutline, IoTimeOutline } from 'react-icons/io5';
+import { loadWeather } from '../../store/weather/weather-actions';
+import { selectWeatherInfo } from '../../store/weather/weather-selection';
 
 const Wrapper = styled.div`
     display: flex;
@@ -21,19 +25,33 @@ const DegCelcius = styled.div`
 `;
 
 export const Weather = () => {
+    const dispatch = useDispatch();
+    const { status, error, deg, city } = useSelector(selectWeatherInfo);
 
-    const deg = -30;
+    useEffect(()=>{
+        
+        dispatch(loadWeather()) 
+   
+      },[dispatch]);
 
     return (
        <Wrapper>
         <IoMoonOutline />
-        <Degrees $deg={deg}>
-            <DegValue>{deg}</DegValue>
-            <DegCelcius $deg={deg}>°c</DegCelcius>
-        </Degrees>
-        {`New York`}
-        <IoTimeOutline />
-        {`Wednesday, 10 january 2021`}
+        {error && <h2>Can't fetch data</h2>}
+        {status === 'loading' && '...'}
+        {status === 'received' && (
+            <>
+            <Degrees $deg={deg.temp}>
+                <DegValue>{Math.ceil(deg.temp)}</DegValue>
+            <DegCelcius $deg={deg.temp}>°c</DegCelcius>
+            </Degrees>
+            {city}
+            <IoTimeOutline />
+            {`Wednesday, 10 january 2021`} 
+            </>
+            
+        )}
+       
        </Wrapper>
     )
 }
